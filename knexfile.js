@@ -10,6 +10,12 @@ module.exports = {
       password: 'knexitup',
       database: 'knex_shopping',
       charset: 'utf8'
+    },
+    migrations: {
+      directory: __dirname + '/knex/migrations'
+    },
+    seeds: {
+      directory: __dirname + '/knex/seeds'
     }
   },
 
