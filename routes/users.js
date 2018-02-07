@@ -34,19 +34,28 @@ router.post(`/login`, (req, res) => {
 });
 
 router.post(`/register`, (req, res) => {
-  knex.raw('select users.email from users where users.email = ?', [req.body.email])
+  let {email, password} = req.body;  // -> let email = req.body.email; let password = req.body.password;
+  if (!(email && password)) { // -> (!email || !password)
+    return res.status(400).json({ message: 'Missing email or password'});
+  }
+  email = email.toLowerCase();
+
+  return knex.raw('select users.email from users where users.email = ?', [email])
   .then(result => {
     if (result.rows.length > 0) {
-      return res.json({ "message": "User already exists" });
+      throw new Error(`User already exists`);;
     } else {
       return result;
     }
   })
   .then(result => {
-    return knex.raw('insert into users (email, password, created_at, updated_at) values (?, ?, ?, ?) RETURNING *', [req.body.email, req.body.password, 'now()', 'now()']);
+    return knex.raw('insert into users (email, password, created_at, updated_at) values (?, ?, ?, ?) RETURNING *', [email, password, 'now()', 'now()']);
   })
   .then(result => {
     return res.json(result.rows[0]);
+  })
+  .catch(err => {
+    return res.status(400).json({ "message": err.message });
   });
 });
 
