@@ -14,8 +14,8 @@ const cart = require(`./routes/cart`);
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(`/users`, users);
-// app.use(`/products`, products);
-// app.use(`/cart`, cart);
+app.use(`/products`, products);
+app.use(`/cart`, cart);
 
 app.listen(PORT, (err) => {
   if (err) {
