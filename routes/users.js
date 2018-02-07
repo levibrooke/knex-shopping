@@ -70,4 +70,50 @@ router.post(`/register`, (req, res) => {
   });
 });
 
+router.put(`/:user_id/forgot-password`, (req, res) => {
+  let {password} = req.body;
+  if (!password) {
+    return res.status(400).json({ message: 'Missing password' });
+  }
+
+  return knex.raw('select * from users where users.id = ?', [req.params.user_id])
+  .then(result => {
+    if (!result.rows.length) {
+      throw new Error(`Requested user does not exist`);
+    } else {
+      return result;
+    }
+  })
+  .then(result => {
+    // result.rows[0].password = password;
+    return knex.raw('update users set password = ? where id = ?', [password, req.params.user_id]);
+  })
+  .then(result => {
+    return res.json({ message: 'New password created!' });
+  })
+  .catch(err => {
+    return res.status(400).json({ message: err.message });
+  });
+});
+
+router.delete(`/:user_id`, (req, res) => {
+  return knex.raw('select * from users where id = ?', [req.params.user_id])
+  .then(result => {
+    if (!result.rows.length) {
+      throw new Error(`User ID not found`);
+    } else {
+      return result;
+    }
+  })
+  .then(result => {
+    return knex.raw('delete from users where id = ?', [req.params.user_id]);
+  })
+  .then(result => {
+    return res.json({ message: `User id: ${req.params.user_id} successfully deleted`});
+  })
+  .catch(err => {
+    return res.status(400).json({ message: err.message });
+  });
+})
+
 module.exports = router;
