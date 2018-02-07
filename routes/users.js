@@ -3,34 +3,45 @@ const knex = require(`../knex/knex`);
 const router = express.Router();
 
 
-
 router.get(`/:user_id`, (req, res) => {
   knex.raw('select * from users where users.id = ?', [req.params.user_id])
   .then(result => {
     if (result.rows.length === 0) {
-      res.json({ "message": "User not found" });
+      throw new Error(`User not found`);
     } else {
-      res.json(result.rows[0]);
+      return res.json(result.rows[0]);
     }
+  })
+  .catch(err => {
+    return res.status(400).json({ message: err.message });
   });
 });
 
 router.post(`/login`, (req, res) => {
-  knex.raw('select users.email from users where users.email = ?', [req.body.email])
+  let {email, password} = req.body;
+  if (!(email && password)) {
+    return res.status(400).json({ message: 'Missing email or password' });
+  }
+  email = email.toLowerCase();
+
+  knex.raw('select * from users where users.email = ?', [email])
   .then(result => {
-    if (result.rows.length === 0) {
-      return res.json({ "message": "User not found" });
+    if (!result.rows.length) {
+      throw new Error(`User not found`);
     } else {
       return result;
     }
   })
   .then(result => {
-    if (result.rows[0].password !== req.body.password) {
-      return res.json({ "message": "Incorrect password" });
+    if (result.rows[0].password !== password) {
+      throw new Error(`Incorrect password`);
     } else {
       return res.json(result.rows[0]);
     }
   })
+  .catch(err => {
+    return res.status(400).json({ message: err.message });
+  });
 });
 
 router.post(`/register`, (req, res) => {
@@ -58,12 +69,5 @@ router.post(`/register`, (req, res) => {
     return res.status(400).json({ "message": err.message });
   });
 });
-
-
-
-// knex.raw('insert into users (email, password) values (?, ?) RETURNING *', [req.body.email, req.body.password])
-      // .then(result => {
-      //   res.json(result);
-      // });
 
 module.exports = router;
