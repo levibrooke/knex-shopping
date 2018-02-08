@@ -44,4 +44,46 @@ router.post(`/new`, (req, res) => {
   });
 });
 
+router.put(`/:product_id`, (req, res) => {
+  let {title, description, inventory, price} = req.body;
+  return knex.raw('select * from products where id = ?', [req.params.product_id])
+  .then(result => {
+    if (!result.rows.length) {
+      throw new Error('Product not found');
+    } else {
+      return result;
+    }
+  })
+  .then(result => {
+    // add some function to create custom string depending on which columns are being updated
+    return knex.raw('update products set (title, description, inventory, price) = (?, ?, ?, ?) where id = ?', [title, description, inventory, price, req.params.product_id]);
+  })
+  .then(result => {
+    return res.json({ message: `Product: ${req.params.product_id} has been updated`});
+  })
+  .catch(err => {
+    return res.status(400).json({ message: err.message });
+  });
+});
+
+router.delete(`/:product_id`, (req, res) => {
+  return knex.raw('select * from products where id = ?', [req.params.product_id])
+  .then(result => {
+    if (!result.rows.length) {
+      throw new Error(`Product id: ${req.params.product_id} not found`);
+    } else {
+      return result;
+    }
+  })
+  .then(result => {
+    return knex.raw('delete from products where id = ?', [req.params.product_id]);
+  })
+  .then(result => {
+    return res.json({ message: `Product id: ${req.params.product_id} successfully deleted`});
+  })
+  .catch(err => {
+    return res.status(400).json({ message: err.message });
+  });
+});
+
 module.exports = router;
