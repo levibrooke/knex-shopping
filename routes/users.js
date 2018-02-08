@@ -24,7 +24,7 @@ router.post(`/login`, (req, res) => {
   }
   email = email.toLowerCase();
 
-  knex.raw('select * from users where users.email = ?', [email])
+  return knex.raw('select * from users where users.email = ?', [email])
   .then(result => {
     if (!result.rows.length) {
       throw new Error(`User not found`);

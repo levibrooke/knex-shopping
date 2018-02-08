@@ -11,6 +11,7 @@ module.exports = {
       database: 'knex_shopping',
       charset: 'utf8'
     },
+    debug: true,
     migrations: {
       directory: __dirname + '/knex/migrations'
     },
