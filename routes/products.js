@@ -55,7 +55,15 @@ router.put(`/:product_id`, (req, res) => {
     }
   })
   .then(result => {
+    
     // add some function to create custom string depending on which columns are being updated
+    // let updateProduct = (req) => {
+    //   let columns = Object.keys(req.body); // array
+    //   console.log(columns);
+
+    //   return `update products set () = () where id = ?`;
+    // };
+
     return knex.raw('update products set (title, description, inventory, price) = (?, ?, ?, ?) where id = ?', [title, description, inventory, price, req.params.product_id]);
   })
   .then(result => {
