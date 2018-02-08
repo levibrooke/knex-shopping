@@ -195,7 +195,7 @@ Use the built in `knex.js` query methods to perform CRUD operations on our DB. R
 
 - `GET - /cart/:user_id`
     - Find all products associated to a user, using `req.params.user_id`, through the `Cart` table.
-        - If successful, resond with all products associated to `user_id`.
+        - If successful, respond with all products associated to `user_id`.
 
 - `POST - /cart/:user_id/:product_id`
     - Insert into Cart table with `req.params.user_id` and `req.params.product_id` valid foreign keys.
