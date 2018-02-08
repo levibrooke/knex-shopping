@@ -4,11 +4,30 @@ const router = express.Router();
 
 
 router.get(`/`, (req, res) => {
-
+  return knex.raw('select * from products')
+  .then(result => {
+    return res.json(result.rows);
+  })
+  .catch(err => {
+    return res.status(400).json({ message: err });
+  });
 });
 
 router.get(`/:product_id`, (req, res) => {
-
+  return knex.raw('select * from products where id = ?', [req.params.product_id])
+  .then(result => {
+    if (result.rows.length === 0) {
+      throw new Error(`Product not found`);
+    } else {
+      return result;
+    }
+  })
+  .then(result => {
+    return res.json(result.rows[0]);
+  })
+  .catch(err => {
+    return res.status(400).json({ message: err.message });
+  });
 });
 
 router.post(`/new`, (req, res) => {
